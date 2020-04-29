@@ -9,6 +9,7 @@ import com.netcracker.ec.provisioning.operations.Operation;
 import com.netcracker.ec.provisioning.operations.ShowOrdersOperation;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -56,6 +57,10 @@ public class Console {
     public void printAvailableOperations() {
         System.out.println("  Operations:");
         Arrays.stream(OperationType.values()).forEach(System.out::println);
+    }
+
+    public void printAvailableOperations(Map<Integer, String> operationsMap) {
+        operationsMap.forEach((key, value) -> System.out.println(key + " - " + value));
     }
 
     public void printOrderInfo(Order order) {

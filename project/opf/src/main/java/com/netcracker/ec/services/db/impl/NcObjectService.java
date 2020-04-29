@@ -1,7 +1,5 @@
 package com.netcracker.ec.services.db.impl;
 
-import com.netcracker.ec.model.db.NcAttribute;
-import com.netcracker.ec.model.db.NcAttributeTypeDef;
 import com.netcracker.ec.model.db.NcObjectType;
 import com.netcracker.ec.model.domain.order.Order;
 import com.netcracker.ec.services.db.DbWorker;
@@ -21,20 +19,24 @@ public class NcObjectService {
         List<Order> orders = new ArrayList<>();
 
         try {
-            String sqlQuery = "select * " +
-                    "from nc_objects " +
-                    "where name like '%Order%';";
+            String sqlQuery = "select o.object_id, o.name, o.object_type_id, t.parent_id " +
+                    "from nc_objects o " +
+                    "inner join nc_object_types t " +
+                    "on o.object_type_id = t.object_type_id " +
+                    "where t.parent_id = 2;";
             ResultSet resultSet = dbWorker.executeSelect(sqlQuery);
             while (resultSet.next()) {
-                Order order = new Order(
-                        resultSet.getInt("object_id"),
-                        resultSet.getString("name"),
-                        new NcObjectType()
+                orders.add(
+                        new Order(
+                                resultSet.getInt("object_id"),
+                                resultSet.getString("name"),
+                                new NcObjectType(
+                                        resultSet.getInt("object_type_id"),
+                                        null,
+                                        null
+                                )
+                        )
                 );
-                order.getObjectType()
-                        .setId(resultSet.getInt("object_type_id"));
-
-                orders.add(order);
             }
             resultSet.close();
 
@@ -44,28 +46,30 @@ public class NcObjectService {
         return orders;
     }
 
-    public List<Order> getOrdersByObjectType(NcObjectType objectType) {
+    public List<Order> getOrdersByObjectTypeId(Integer id) {
         List<Order> orders = new ArrayList<>();
 
         try {
-            String sqlQuery = String.format("select * " +
-                    "from nc_objects " +
-                    "where name like '%s' " +
-                    "and object_type_id = %d;",
-                    "%Order%",
-                    objectType.getId());
+            String sqlQuery = String.format("select o.object_id, o.name, o.object_type_id, t.parent_id " +
+                            "from nc_objects o " +
+                            "inner join nc_object_types t " +
+                            "on o.object_type_id = t.object_type_id " +
+                            "where t.parent_id = 2 " +
+                            "and o.object_type_id = %d;", id);
 
             ResultSet resultSet = dbWorker.executeSelect(sqlQuery);
             while (resultSet.next()) {
-                Order order = new Order(
-                        resultSet.getInt("object_id"),
-                        resultSet.getString("name"),
-                        new NcObjectType()
+                orders.add(
+                        new Order(
+                                resultSet.getInt("object_id"),
+                                resultSet.getString("name"),
+                                new NcObjectType(
+                                        resultSet.getInt("object_type_id"),
+                                        null,
+                                        null
+                                )
+                        )
                 );
-                order.getObjectType()
-                        .setId(resultSet.getInt("object_type_id"));
-
-                orders.add(order);
             }
             resultSet.close();
 

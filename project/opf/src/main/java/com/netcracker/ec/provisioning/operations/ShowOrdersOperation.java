@@ -1,9 +1,7 @@
 package com.netcracker.ec.provisioning.operations;
 
-import com.netcracker.ec.model.db.NcObjectType;
 import com.netcracker.ec.model.domain.order.Order;
 import com.netcracker.ec.services.console.Console;
-import com.netcracker.ec.services.db.impl.NcAttributeService;
 import com.netcracker.ec.services.db.impl.NcObjectService;
 import com.netcracker.ec.services.db.impl.NcObjectTypeService;
 import com.netcracker.ec.services.db.impl.NcParamsService;
@@ -30,7 +28,7 @@ public class ShowOrdersOperation implements Operation {
         System.out.println("Please Select Operation.");
 
         Map<Integer, String> operationModifications = getOperationModificationsMap();
-        operationModifications.forEach((key, value) -> System.out.println(key + " - " + value));
+        console.printAvailableOperations(operationModifications);
 
         Integer operationModification = console.nextAvailableOperation(operationModifications.keySet());
         switch (operationModification) {
@@ -48,24 +46,30 @@ public class ShowOrdersOperation implements Operation {
     private void showAllOrders() {
         List<Order> orders = ncObjectService.getOrders();
 
-        orders.forEach(order -> order.setParameters(
-                ncParamsService.getParamsByObjectId(order.getId())));
+        initOrdersParameters(orders);
 
-        orders.forEach(order -> console.printOrderInfo(order));
+        printOrders(orders);
     }
 
     private void showOrderOfASpecificObjectType() {
-        Map<Integer, NcObjectType> orderObjectTypeMap = ncObjectTypeService.getOrderObjectTypes();
-        orderObjectTypeMap.forEach((key, value) -> System.out.println(key + " - " + value.getName()));
+        Map<Integer, String> orderObjectTypeMap = ncObjectTypeService.getOrdersObjectTypeNameMap();
+        console.printAvailableOperations(orderObjectTypeMap);
 
         Integer objectTypeId = console.nextAvailableOperation(orderObjectTypeMap.keySet());
-        NcObjectType selectedObjectType = orderObjectTypeMap.get(objectTypeId);
 
-        List<Order> orders = ncObjectService.getOrdersByObjectType(selectedObjectType);
+        List<Order> orders = ncObjectService.getOrdersByObjectTypeId(objectTypeId);
 
+        initOrdersParameters(orders);
+
+        printOrders(orders);
+    }
+
+    private void initOrdersParameters(List<Order> orders) {
         orders.forEach(order -> order.setParameters(
                 ncParamsService.getParamsByObjectId(order.getId())));
+    }
 
+    private void printOrders(List<Order> orders) {
         orders.forEach(order -> console.printOrderInfo(order));
     }
 

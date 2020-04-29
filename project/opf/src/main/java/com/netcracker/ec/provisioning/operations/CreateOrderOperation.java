@@ -32,18 +32,17 @@ public class CreateOrderOperation implements Operation {
     public void execute() {
         System.out.println("Please Select Object Type.");
 
-        Map<Integer, NcObjectType> orderObjectTypeMap = ncObjectTypeService.getOrderObjectTypes();
-        orderObjectTypeMap.forEach((key, value) -> System.out.println(key + " - " + value.getName()));
+        Map<Integer, String> orderObjectTypeMap = ncObjectTypeService.getOrdersObjectTypeNameMap();
+        console.printAvailableOperations(orderObjectTypeMap);
 
         Integer objectTypeId = console.nextAvailableOperation(orderObjectTypeMap.keySet());
-        NcObjectType selectedObjectType = orderObjectTypeMap.get(objectTypeId);
 
-        List<NcAttribute> attributeList = ncAttributeService.getAttributesByOrderType(selectedObjectType);
+        List<NcAttribute> attributeList = ncAttributeService.getAttributesByOrderTypeId(objectTypeId);
 
         try {
-            Order order = new Order(selectedObjectType);
+            Order order = new Order(ncObjectTypeService.getObjectTypeById(objectTypeId));
             order.setId(IdGenerator.generateId());
-            order.setName(generateOrderName(selectedObjectType));
+            order.setName(generateOrderName(order.getObjectType()));
             attributeList.forEach(attr -> order.getParameters()
                     .put(attr, console.getAttributeValue(attr)));
 

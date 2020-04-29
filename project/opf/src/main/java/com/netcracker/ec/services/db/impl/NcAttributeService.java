@@ -2,7 +2,6 @@ package com.netcracker.ec.services.db.impl;
 
 import com.netcracker.ec.model.db.NcAttribute;
 import com.netcracker.ec.model.db.NcAttributeTypeDef;
-import com.netcracker.ec.model.db.NcObjectType;
 import com.netcracker.ec.services.db.DbWorker;
 
 import java.sql.ResultSet;
@@ -16,7 +15,7 @@ public class NcAttributeService {
     public NcAttributeService () {
     }
 
-    public List<NcAttribute> getAttributesByOrderType(NcObjectType objectType) {
+    public List<NcAttribute> getAttributesByOrderTypeId(Integer id) {
         List<NcAttribute> attributes = new ArrayList<>();
 
         try {
@@ -29,7 +28,7 @@ public class NcAttributeService {
                     "inner join nc_attr_type_defs d " +
                     "on a.attr_type_def_id = d.attr_type_def_id " +
                     "where ao.object_type_id = 2 or ao.object_type_id = %d;",
-                    objectType.getId());
+                    id);
 
             ResultSet resultSet = dbWorker.executeSelect(sqlQuery);
             while (resultSet.next()) {
