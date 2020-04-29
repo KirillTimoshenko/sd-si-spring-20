@@ -1,10 +1,15 @@
 package com.netcracker.ec.services.db.impl;
 
+import com.netcracker.ec.model.db.NcAttribute;
+import com.netcracker.ec.model.db.NcAttributeTypeDef;
+import com.netcracker.ec.model.db.NcObjectType;
 import com.netcracker.ec.model.domain.order.Order;
 import com.netcracker.ec.services.db.DbWorker;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class NcObjectService {
     private static final DbWorker dbWorker = DbWorker.getInstance();
@@ -12,19 +17,62 @@ public class NcObjectService {
     public NcObjectService() {
     }
 
-    public int getOrderCount() {
-        int count = 0;
+    public List<Order> getOrders() {
+        List<Order> orders = new ArrayList<>();
+
         try {
-            String sqlQuery = "select count(*) from nc_objects";
+            String sqlQuery = "select * " +
+                    "from nc_objects " +
+                    "where name like '%Order%';";
             ResultSet resultSet = dbWorker.executeSelect(sqlQuery);
-            resultSet.next();
-            count = resultSet.getInt(1);
+            while (resultSet.next()) {
+                Order order = new Order(
+                        resultSet.getInt("object_id"),
+                        resultSet.getString("name"),
+                        new NcObjectType()
+                );
+                order.getObjectType()
+                        .setId(resultSet.getInt("object_type_id"));
+
+                orders.add(order);
+            }
             resultSet.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return count;
+        return orders;
+    }
+
+    public List<Order> getOrdersByObjectType(NcObjectType objectType) {
+        List<Order> orders = new ArrayList<>();
+
+        try {
+            String sqlQuery = String.format("select * " +
+                    "from nc_objects " +
+                    "where name like '%s' " +
+                    "and object_type_id = %d;",
+                    "%Order%",
+                    objectType.getId());
+
+            ResultSet resultSet = dbWorker.executeSelect(sqlQuery);
+            while (resultSet.next()) {
+                Order order = new Order(
+                        resultSet.getInt("object_id"),
+                        resultSet.getString("name"),
+                        new NcObjectType()
+                );
+                order.getObjectType()
+                        .setId(resultSet.getInt("object_type_id"));
+
+                orders.add(order);
+            }
+            resultSet.close();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return orders;
     }
 
     public int getOrderCountByOrderType(int orderTypeId) {

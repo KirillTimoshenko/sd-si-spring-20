@@ -60,7 +60,9 @@ public class Console {
 
     public void printOrderInfo(Order order) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("Order name: " + order.getName() + "\n");
+        stringBuilder.append("Order name: ")
+                .append(order.getName())
+                .append("\n");
         order.getParameters().forEach((key, value) ->
                 stringBuilder.append("  ")
                         .append(key.getName())
@@ -78,11 +80,11 @@ public class Console {
         return scanner.nextInt();
     }
 
-    public Integer getOrderTypeId(Set<Integer> objectTypeSet) {
+    public Integer nextAvailableOperation(Set<Integer> availableOperationsSet) {
         Integer id;
         do {
             id = console.nextOperationId();
-        } while (!objectTypeSet.contains(id));
+        } while (!availableOperationsSet.contains(id));
         return id;
     }
 

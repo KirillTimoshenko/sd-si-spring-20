@@ -35,7 +35,7 @@ public class CreateOrderOperation implements Operation {
         Map<Integer, NcObjectType> orderObjectTypeMap = ncObjectTypeService.getOrderObjectTypes();
         orderObjectTypeMap.forEach((key, value) -> System.out.println(key + " - " + value.getName()));
 
-        Integer objectTypeId = console.getOrderTypeId(orderObjectTypeMap.keySet());
+        Integer objectTypeId = console.nextAvailableOperation(orderObjectTypeMap.keySet());
         NcObjectType selectedObjectType = orderObjectTypeMap.get(objectTypeId);
 
         List<NcAttribute> attributeList = ncAttributeService.getAttributesByOrderType(selectedObjectType);
